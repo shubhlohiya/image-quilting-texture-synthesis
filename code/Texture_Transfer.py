@@ -16,12 +16,12 @@ def Error(Block, final, target, alpha):
 	#plus (1-ɑ) times squared error between the correspondence map pixels within the source texture block and those at current target image position.
 
 	#block overlap matching error
-	e1 =  np.sum((final != -1)*(Block-final)**2)
+	e1 =  np.sqrt(np.sum((final != -1)*((Block-final)**2)))
 	#squared error between the correspondence map pixels within the source texture block and those at current target image position.
-	e2 = np.sum((np.mean(final,axis=2) != -1)*(np.mean((Block-target), axis = 2))**2)
+	e2 = np.sqrt(np.sum(((np.mean(final,axis=2) != -1)*(np.mean((Block-target), axis = 2))**2)))
 
 	error = alpha * e1 + (1 - alpha) * e2
-
+	#print(error)
 	return error
 
 def next_block(blocks, final, target, blocksize, alpha, tolerance):
@@ -64,7 +64,7 @@ def Texture_Trasfer(source_img, target_img, block_size, tolerance, alpha, overla
 	blocks = create_block_list(source_img, row_s, col_s, block_size)
 	print('.')
 	#assigning the top left corner of final image with random block
-	final_img[0:block_size[0], 0:block_size[1], :] = blocks[np.random.randint(blocks.shape[0])]
+	final_img[0:block_size[0], 0:block_size[1], :] = blocks[0]
 
 	nRowBlocks = int(np.ceil((row_t - block_size[0])/(block_size[0] - overlap)) + 1)
 	nColBlocks = int(np.ceil((col_t - block_size[1])/(block_size[1] - overlap)) + 1)
@@ -151,10 +151,15 @@ def Texture_Trasfer(source_img, target_img, block_size, tolerance, alpha, overla
 
 target_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/lincoln.jpg')
 source_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/t4.jpg')
-alpha = 0.7
+alpha = 0.1
 tolerance = 0.1
-block_size = [20,20]
-overlap = 10
+block_size = [30,30]
+overlap = 15
 
-f = Texture_Trasfer(source_img, target_img, block_size, tolerance, alpha, overlap)
+for k in range(6):
+	f = Texture_Trasfer(source_img, target_img, block_size, tolerance, alpha, overlap)
+	source_img = f
+	alpha = 0.8 * (k-1)/5 + 0.1
+	block_size = [block_size[0] - 3, block_size[1] - 3]
+
 cv.imwrite('f.jpg', f)
