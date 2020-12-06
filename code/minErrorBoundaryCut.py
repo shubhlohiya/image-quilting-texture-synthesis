@@ -81,7 +81,7 @@ def minCostMask(New, Bl, Bt, overlap_type,overlap_size):
 	if overlap_type=='v':
 
 		e_dif = Bl[:,-overlap_size:] - New[:,0:overlap_size]
-		e_arr = np.power(e_dif,2).toList()
+		e_arr = np.power(e_dif,2).tolist()
 
 		patch_mask[:,0:overlap_size] = minErrorBoundaryCut(e_arr)
 
@@ -91,7 +91,7 @@ def minCostMask(New, Bl, Bt, overlap_type,overlap_size):
 		e_arr = np.power(e_dif,2)
 		e_arr = e_arr.transpose()
 		# vertical
-		e_arr = e_arr.toList()
+		e_arr = e_arr.tolist()
 
 		patch_mask[0:overlap_size,:] = minErrorBoundaryCut(e_arr).transpose()
 		# horizontal
@@ -100,15 +100,15 @@ def minCostMask(New, Bl, Bt, overlap_type,overlap_size):
 	elif overlap_type=='b':
 		# vertical overlap
 		e_difv = Bl[:,-overlap_size:] - New[:,:overlap_size]
-		e_arrv = np.power(e_dif,2).toList()
+		e_arrv = np.power(e_difv,2).tolist()
 
 		patch_mask[:,0:overlap_size] = minErrorBoundaryCut(e_arrv)
 
 		# horizontal overlap
 		e_difh = Bt[-overlap_size:,:] - New[:overlap_size,:]
-		e_arrh = np.power(e_dif,2)
+		e_arrh = np.power(e_difh,2)
 		e_arrh = e_arrh.transpose()
-		e_arrh = e_arrh.toList()
+		e_arrh = e_arrh.tolist()
 
 		patch_mask[0:overlap_size,:] = patch_mask[0:overlap_size,:]*(minErrorBoundaryCut(e_arrh).transpose())
 

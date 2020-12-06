@@ -5,7 +5,7 @@ from minErrorBoundaryCut import minCostMask
 def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
     """
     :param img: Array containing the input image
-    :param blockSize: tuple with dimensions of each block for texture synthesis
+    :param blockSize: size of each block for texture synthesis
     :param overlap: size of overlap between blocks
     :param h_out: height of output
     :param w_out: width of output
@@ -31,13 +31,14 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
                 out_img[0:blockSize[0],0:blockSize[1],:] = blocks[np.random.randint(len(blocks))]
                 continue
             # get current block location
-            startX = j * (blockSize[1] - overlap)
-            # col
-            endX = min(startX + blockSize[1], w_out)
-            startY = i * (blockSize[0] - overlap)  
+
             # row
-            endY = min(startY + blockSize[0], h_out)
-            curr_block = out_img[startY:endY, startX:endX, :]
+            startX = i * (blockSize[0] - overlap)
+            endX = min(startX + blockSize[0], w_out)
+            # col
+            startY = j * (blockSize[1] - overlap)  
+            endY = min(startY + blockSize[1], h_out)
+            curr_block = out_img[startX:endX, startY:endY, :]
 
             matched_block = get_match(blocks, curr_block, blockSize, tolerance)
 
@@ -49,7 +50,7 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
             if i == 0:      
                 overlapType = 'v'
                 B1 = out_img[startX:endX,B1StartY:B1EndY+1,:]
-                print(B1)
+                
                 mask = minCostMask(matched_block[:,:,0],B1[:,:,0],0,overlapType,overlap)
             elif j == 0:          
                 overlapType = 'h'
@@ -60,15 +61,16 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
                 B1 = out_img[startX:endX,B1StartY:B1EndY+1,:]
                 B2 = out_img[B1StartX:B1EndX+1, startY:endY, :]
                 mask = minCostMask(matched_block[:,:,0],B1[:,:,0],B2[:,:,0],overlapType,overlap)
+
             mask = np.repeat(np.expand_dims(mask,axis=2),3,axis=2)
             maskNegate = mask==0
             out_img[startX:endX,startY:endY,:] = maskNegate*curr_block
             out_img[startX:endX,startY:endY,:] = matched_block*mask+curr_block
             
-            if endY == outSizeY:
+            if endY == w_out:
                 break
 
-        if endX == outSizeX:
+        if endX == h_out:
             break
 
     return out_img
@@ -91,11 +93,12 @@ def SSDerror(block1, block0):
     return np.sum((block0 != -1)*(block1-block0)**2)
 
 
-img = Image.open("../data/t7.png").convert('RGB')
-img = np.asarray(img)
-new_h, new_w = int(2 * img.shape[0]), int(2 * img.shape[1])
-new_img = synthesize(img, [24, 24], 10 , new_h, new_w, 1)
+# img = Image.open("../data/t7.png").convert('RGB')
+# img.show()
+# img = np.asarray(img)
+# new_h, new_w = int(2 * img.shape[0]), int(2 * img.shape[1])
+# new_img = synthesize(img, [48, 48], 10 , new_h, new_w, 0.1)
 
-new_img = Image.fromarray(new_img, 'RGB')
-new_img.save('trial.png')
-new_img.show()
+# new_img = Image.fromarray(new_img, 'RGB')
+# new_img.save('trial.png')
+# new_img.show()
