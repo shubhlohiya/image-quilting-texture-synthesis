@@ -3,9 +3,7 @@ import numpy as np
 import sys, argparse
 parser = argparse.ArgumentParser()
 from synthesize import  synthesize
-from transfer import transfer
-
-args = parser.parse_args()
+# from transfer import transfer
 
 def synthesis(args):
     try:
@@ -14,8 +12,11 @@ def synthesis(args):
             h_out, w_out = args.height, args.width
         else:
             h_out, w_out =int(args.scale*img.shape[0]), int(args.scale*img.shape[1])
+        overlap = args.overlap
+        if not args.overlap:
+            overlap = int(args.block_size/6)
         result = synthesize(img, (args.block_size, args.block_size),
-                            args.overlap, h_out, w_out, args.tolerance)
+                            overlap, h_out, w_out, args.tolerance)
         result = Image.fromarray(result.astype('uint8'), 'RGB')
         result.show()
         if args.save:
@@ -44,8 +45,8 @@ if __name__ == "__main__":
     parser.add_argument("-ov", "--overlap", type=int, default=None,
                         help="overlap size in pixels (defaults to block_size/6)")
     parser.add_argument("-sc", "--scale", type=float, default=2, help="scaling w.r.t. to input texture")
-    parser.add_argument("-h", "--height", type=int, default=None, help="output height")
-    parser.add_argument("-w", "--width", type=int, default=None, help="output width")
+    parser.add_argument("-oh", "--height", type=int, default=None, help="output height")
+    parser.add_argument("-ow", "--width", type=int, default=None, help="output width")
     parser.add_argument("-tol", "--tolerance", type=float, default=0.1, help="tolerance fraction")
     parser.add_argument("-a", "--alpha", type=float, default=0.1,
                         help="weightage of target image intensity error wrt texture boundary error")
