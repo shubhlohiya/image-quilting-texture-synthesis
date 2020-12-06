@@ -3,7 +3,7 @@ import numpy as np
 def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
     """
     :param img: Array containing the input image
-    :param blockSize: size of each block for texture synthesis
+    :param blockSize: tuple with dimensions of each block for texture synthesis
     :param overlap: size of overlap between blocks
     :param h_out: height of output
     :param w_out: width of output
