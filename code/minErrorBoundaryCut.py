@@ -48,7 +48,7 @@ def minErrorBoundaryCut(e_arr):
 
 	for j in range(0,c):
 		if E[-1][j]== min_cost:
-			border_index[-1] = j;
+			border_index[-1] = j
 
 	
 
