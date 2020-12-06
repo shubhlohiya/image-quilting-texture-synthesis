@@ -106,7 +106,7 @@ def minimumCostMask(New, Bl, Bt, overlap_type,overlap_size):
 
 	"""
 
-	patch_mask = np.ones(Ref.shape)
+	patch_mask = np.ones(New.shape)
 
 	if overlap_type=='v':
 
