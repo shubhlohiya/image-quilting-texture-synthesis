@@ -1,4 +1,5 @@
 import numpy as np
+from minErrorBoundaryCut import minCostMask 
 
 def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
     """
@@ -10,7 +11,7 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
     :param tolerance: fraction tolerance for neighbour block matching
     :return: synthesized texture
     """
-
+    # img = np.array(img)
     h,w,c = img.shape
     blocks = [] # list to contain all blocks of blockSize
     for i in range(h-blockSize[0]):
@@ -36,11 +37,42 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
 
             matched_block = get_match(blocks, curr_block, blockSize, tolerance)
 
+            B1EndY = startY+overlap-1
+            B1StartY = B1EndY-(matched_block.shape[1])+1
+            B1EndX = startX+overlap-1
+            B1StartX = B1EndX-(matched_block.shape[0])+1
+
+            if i == 0:      
+                overlapType = 'v'
+                B1 = out_img[startX:endX,B1StartY:B1EndY+1,:]
+                mask = minCostMask(matched_block[:,:,0],B1[:,:,0],0,overlapType,overlap)
+            elif j == 0:          
+                overlapType = 'h'
+                B2 = out_img[B1StartX:B1EndX+1, startY:endY, :]
+                mask = minCostMask(matched_block[:,:,0],0,B2[:,:,0],overlapType,overlap)
+            else:
+                overlapType = 'b'
+                B1 = out_img[startX:endX,B1StartY:B1EndY+1,:]
+                B2 = out_img[B1StartX:B1EndX+1, startY:endY, :]
+                mask = minCostMask(matched_block[:,:,0],B1[:,:,0],B2[:,:,0],overlapType,overlap)
+            mask = np.repeat(np.expand_dims(mask,axis=2),3,axis=2)
+            maskNegate = mask==0
+            out_img[startX:endX,startY:endY,:] = maskNegate*curr_block
+            out_img[startX:endX,startY:endY,:] = matched_block*mask+curr_block
+            
+            if endY == outSizeY:
+                break
+
+        if endX == outSizeX:
+            break
+
+    return out_img
+
 
 def get_match(blocks, curr_block, blockSize, tolerance):
     """Function that returns a good block match for the current overlap."""
     h, w, c = curr_block.shape
-    errors = [(SSDerror(block[0:h, 0:w, 0:c], curr_block)) block in blocks]
+    errors = [(SSDerror(block[0:h, 0:w, 0:c], curr_block)) for block in blocks]
     min_error = np.min(errors)
     matches = [block[0:h, 0:w, 0:c] for i, block in enumerate(blocks)
                if errors[i]<=(1+tolerance)*min_error]
