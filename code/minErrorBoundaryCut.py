@@ -38,9 +38,6 @@ def minErrorBoundaryCut(e_arr):
 
 						E[i][j] = e_arr[i][j] + min(E[i-1][j-1],E[i-1][j],E[i-1][j+1])
 
-	print(E[0])
-	print(E[1])
-	print(E[2])
 	# Matrix E is formed.
 	# To find the minimum cost path, we start with the minimal value of E in the last row and trace back.
 
@@ -86,21 +83,81 @@ def minErrorBoundaryCut(e_arr):
 					if E[i][k] == nextmin_cost:
 						border_index[i] = k
 
+
+	overlap_mask = np.ones(np.array(e_arr).shape)
+
 	for i in range(0,r):
-		print(border_index[i])
+		arr_mask[i,0:border_index[i]] = np.zeros(border_index[i])
+
+
+	return overlap_mask
+
+
+
     # Border index is the vector of indices where the border is cut between the existing block and new block
 
     # This is implemented for a vertical cut. For a horizontal cut, we will take transpose of input array followed by transpose of the output.
 
+def minimumCostMask(New, Bl, Bt, overlap_type,overlap_size):
+
+	"""
+		New block to be placed. Bl is block to the left and Bt is block on top. According to the overlap_type, 
+		the mask would be returned
+
+	"""
+
+	patch_mask = np.ones(Ref.shape)
+
+	if overlap_type=='v':
+
+		e_dif = Bl[:,-overlap_size:] - New[:,:overlap_size]
+		e_arr = np.power(e_dif,2).toList()
+
+		patch_mask[:,0:overlap_size] = minErrorBoundaryCut(e_arr)
+
+	elif overlap_type=='h':
+
+		e_dif = Bt[-overlap_size:,:] - New[:overlap_size,:]
+		# horizontal
+		e_arr = np.power(e_dif,2)
+		e_arr = e_arr.transpose()
+		# vertical
+		e_arr = e_arr.toList()
+
+		patch_mask[0:overlap_size,:] = minErrorBoundaryCut(e_arr).transpose()
+		# horizontal
 
 
-# eg 
+	elif overlap_type=='b':
 
-arr= [ [3,2,3],
-       [5,2,0],
-       [3,1,6]]
+		# vertical overlap
 
-minErrorBoundaryCut(arr)
+		e_difv = Bl[:,-overlap_size:] - New[:,:overlap_size]
+		e_arrv = np.power(e_dif,2).toList()
+
+		patch_mask[:,0:overlap_size] = minErrorBoundaryCut(e_arrv)
+
+		# horizontal overlap
+
+		e_difh = Bt[-overlap_size:,:] - New[:overlap_size,:]
+		e_arrh = np.power(e_dif,2)
+		e_arrh = e_arrh.transpose()
+		e_arrh = e_arrh.toList()
+
+		patch_mask[0:overlap_size,:] = patch_mask[0:overlap_size,:]*(minErrorBoundaryCut(e_arrh).transpose())
+
+	else:
+
+		print('Error')
+
+
+	return patch_mask
+		
+
+
+
+
+
 
 
 
