@@ -149,17 +149,17 @@ def Texture_Trasfer(source_img, target_img, block_size, tolerance, alpha, overla
 	return final_img
 
 
-target_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/lincoln.jpg')
-source_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/t4.jpg')
+target_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/van_gogh.jpeg')
+source_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/landscape.jpeg')
 alpha = 0.1
-tolerance = 0.1
+tolerance = 0.999
 block_size = [30,30]
-overlap = 15
+overlap = 10
 
-for k in range(6):
+for k in range(4):
 	f = Texture_Trasfer(source_img, target_img, block_size, tolerance, alpha, overlap)
 	source_img = f
-	alpha = 0.8 * (k-1)/5 + 0.1
+	alpha = 0.8 * (k)/3 + 0.1
 	block_size = [block_size[0] - 3, block_size[1] - 3]
 
 cv.imwrite('f.jpg', f)
