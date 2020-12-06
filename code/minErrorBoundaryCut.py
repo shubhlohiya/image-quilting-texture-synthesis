@@ -79,7 +79,8 @@ def minCostMask(New, Bl, Bt, overlap_type,overlap_size):
 	patch_mask = np.ones(New.shape)
 
 	if overlap_type=='v':
-		e_dif = Bl[:,-overlap_size:] - New[:,:overlap_size]
+
+		e_dif = Bl[:,-overlap_size:] - New[:,0:overlap_size]
 		e_arr = np.power(e_dif,2).toList()
 
 		patch_mask[:,0:overlap_size] = minErrorBoundaryCut(e_arr)
