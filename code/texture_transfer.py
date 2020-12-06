@@ -1,7 +1,7 @@
 import numpy as np 
 from minErrorBoundaryCut import *
 import cv2 as cv
-from PIL import Image
+
 
 def create_blocks(source_img, row_s, col_s, block_size):
     blocks = []
