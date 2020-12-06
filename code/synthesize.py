@@ -1,4 +1,3 @@
-from PIL import Image
 import numpy as np
 from minErrorBoundaryCut import minCostMask 
 
@@ -12,7 +11,7 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
     :param tolerance: fraction tolerance for neighbour block matching
     :return: synthesized texture
     """
-    img = np.array(img)
+
     h,w,c = img.shape
     blocks = [] # list to contain all blocks of blockSize
     for i in range(h-blockSize[0]):
@@ -27,49 +26,45 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
     for i in range(int(nRowBlocks)):
         for j in range(int(nColBlocks)):
             if i==0 and j==0:
-                # out_img[0:blockSize[0], 0:blockSize[1], :] = np.random.choice(blocks)
                 out_img[0:blockSize[0],0:blockSize[1],:] = blocks[np.random.randint(len(blocks))]
                 continue
             # get current block location
-
             # row
             startX = i * (blockSize[0] - overlap)
             endX = min(startX + blockSize[0], h_out)
             # col
             startY = j * (blockSize[1] - overlap)  
             endY = min(startY + blockSize[1], w_out)
-            curr_block = out_img[startX:endX, startY:endY, :]
 
+            curr_block = out_img[startX:endX, startY:endY, :]
             matched_block = get_match(blocks, curr_block, blockSize, tolerance)
 
+            # B1 and B2 are the blocks overlapping to the left and top respectively
             B1EndY = startY+overlap-1
             B1StartY = B1EndY-(matched_block.shape[1])+1
             B1EndX = startX+overlap-1
             B1StartX = B1EndX-(matched_block.shape[0])+1
 
             if i == 0:      
-                overlapType = 'v'
+                overlapType = 'v' # vertical
                 B1 = out_img[startX:endX,B1StartY:B1EndY+1,:]
-                
                 mask = minCostMask(matched_block[:,:,0],B1[:,:,0],0,overlapType,overlap)
             elif j == 0:          
-                overlapType = 'h'
+                overlapType = 'h' # horizontal
                 B2 = out_img[B1StartX:B1EndX+1, startY:endY, :]
                 mask = minCostMask(matched_block[:,:,0],0,B2[:,:,0],overlapType,overlap)
             else:
-                overlapType = 'b'
+                overlapType = 'b' # both
                 B1 = out_img[startX:endX,B1StartY:B1EndY+1,:]
                 B2 = out_img[B1StartX:B1EndX+1, startY:endY, :]
                 mask = minCostMask(matched_block[:,:,0],B1[:,:,0],B2[:,:,0],overlapType,overlap)
 
-            mask = np.repeat(np.expand_dims(mask,axis=2),3,axis=2)
-            maskNegate = mask==0
-            out_img[startX:endX,startY:endY,:] = maskNegate*curr_block
+            mask = np.expand_dims(mask,axis=2)
+            out_img[startX:endX,startY:endY,:] = (1-mask)*curr_block
             out_img[startX:endX,startY:endY,:] = matched_block*mask+curr_block
             
             if endY == w_out:
                 break
-
         if endX == h_out:
             break
 
@@ -83,22 +78,8 @@ def get_match(blocks, curr_block, blockSize, tolerance):
     min_error = np.min(errors)
     matches = [block[0:h, 0:w, 0:c] for i, block in enumerate(blocks)
                if errors[i]<=(1+tolerance)*min_error]
-
-    c = np.random.randint(len(matches))
-    return matches[c]
-    # return np.random.choice(matches)
+    return matches[np.random.randint(len(matches))]
 
 def SSDerror(block1, block0):
     """Function that returns sum of squared differences between block1 and block0."""
     return np.sum((block0 != -1)*(block1-block0)**2)
-
-
-# img = Image.open("../data/t7.png").convert('RGB')
-# img.show()
-# img = np.asarray(img)
-# new_h, new_w = int(2 * img.shape[0]), int(2 * img.shape[1])
-# new_img = synthesize(img, [48, 48], 10 , new_h, new_w, 0.1)
-
-# new_img = Image.fromarray(new_img, 'RGB')
-# new_img.save('trial.png')
-# new_img.show()
