@@ -1,10 +1,9 @@
 from PIL import Image
 import numpy as np
-import argparse
+import sys, argparse
 parser = argparse.ArgumentParser()
 from synthesize import  synthesize
 from transfer import transfer
-import sys
 
 args = parser.parse_args()
 
