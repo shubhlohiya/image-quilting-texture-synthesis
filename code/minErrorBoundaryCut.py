@@ -87,7 +87,7 @@ def minErrorBoundaryCut(e_arr):
 	overlap_mask = np.ones(np.array(e_arr).shape)
 
 	for i in range(0,r):
-		arr_mask[i,0:border_index[i]] = np.zeros(border_index[i])
+		overlap_mask[i,0:border_index[i]] = np.zeros(border_index[i])
 
 
 	return overlap_mask
