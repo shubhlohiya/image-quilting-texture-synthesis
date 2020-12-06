@@ -18,6 +18,10 @@ def synthesis(args):
                             args.overlap, h_out, w_out, args.tolerance)
         result = Image.fromarray(result.astype('uint8'), 'RGB')
         result.show()
+        if args.save:
+            name = args.img.split("/")[-1].split(".")[0]
+            result.save("../results/synthesis/"+name+"_b="+str(args.block_size)+"_o="+
+                        str(args.overlap)+"_t="+str(args.tolerance).replace(".", "_")+".png")
     except Exception as E:
         print("ERROR: ", E)
         sys.exit(1)
@@ -32,8 +36,9 @@ def transfer(args):
 if __name__ == "__main__":
     parser.add_argument("--synthesis", action="store_true", help="perform texture synthesis")
     parser.add_argument("--transfer", action="store_true", help="perform texture transfer")
+    parser.add_argument("--save", action="store_true", help="save result")
     parser.add_argument("-i", "--img", type=str, help="path of input image for synthesis/transfer")
-    parser.add_argument("-tex", "--texture", type=str, help="path of texture image for transfer")
+    parser.add_argument("-t", "--texture", type=str, help="path of texture image for transfer")
     # parser.add_argument("-tar", "--target", type=str, help="path of target image for transfer")
     parser.add_argument("-bs", "--block_size", type=int, default=100, help="block size in pixels")
     parser.add_argument("-ov", "--overlap", type=int, default=None,
@@ -41,7 +46,7 @@ if __name__ == "__main__":
     parser.add_argument("-sc", "--scale", type=float, default=2, help="scaling w.r.t. to input texture")
     parser.add_argument("-h", "--height", type=int, default=None, help="output height")
     parser.add_argument("-w", "--width", type=int, default=None, help="output width")
-    parser.add_argument("-t", "--tolerance", type=float, default=0.1, help="tolerance fraction")
+    parser.add_argument("-tol", "--tolerance", type=float, default=0.1, help="tolerance fraction")
     parser.add_argument("-a", "--alpha", type=float, default=0.1,
                         help="weightage of target image intensity error wrt texture boundary error")
     args = parser.parse_args()
