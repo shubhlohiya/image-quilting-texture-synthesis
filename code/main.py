@@ -46,3 +46,13 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--alpha", type=float, default=0.1,
                         help="weightage of target image intensity error wrt texture boundary error")
     args = parser.parse_args()
+
+    if args.synthesis and args.transfer:
+        print("ERROR: Either synthesis or transfer can be performed at once")
+        sys.exit(1)
+    elif args.synthesis:
+        synthesis(args)
+    elif args.transfer():
+        transfer(args)
+    else:
+        print("ERROR: Either synthesis or transfer must be selected")
