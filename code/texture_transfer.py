@@ -146,12 +146,12 @@ def Texture_Transfer(source_img, target_crop_img, block_size, overlap, alpha, to
     return final_img
 
 
-target_crop_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/bill-big.jpg')
-source_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/rice.jpg')
+target_crop_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/girl.jpg')
+source_img = cv.imread('/home/prathmesh/Desktop/CS663/image-quilting-texture-synthesis/data/fabric.jpg')
 alpha = 0.2
 tolerance = 0.1
-block_size = [20,20]
-overlap = 10
+block_size = [15,15]
+overlap = 7
 
 f = Texture_Transfer(source_img, target_crop_img, block_size, overlap, alpha, tolerance)
 cv.imwrite('f.jpg', f)
