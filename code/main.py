@@ -3,7 +3,7 @@ import numpy as np
 import sys, argparse
 parser = argparse.ArgumentParser()
 from synthesize import  synthesize
-# from transfer import transfer
+from transfer import texturize
 
 def synthesis(args):
     try:
@@ -29,7 +29,22 @@ def synthesis(args):
 
 def transfer(args):
     try:
-        pass
+        texture = np.asarray(Image.open(args.texture).convert('RGB'))
+        target = np.asarray(Image.open(args.img).convert('RGB'))
+
+        overlap = args.overlap
+        if not args.overlap:
+            overlap = int(args.block_size / 2)
+        result = texturize(texture, target, (args.block_size, args.block_size),
+                           overlap, args.alpha, args.tolerance)
+        result = Image.fromarray(result.astype('uint8'), 'RGB')
+        result.show()
+        if args.save:
+            texture_name = args.texture.split("/")[-1].split(".")[0]
+            target_name = args.img.split("/")[-1].split(".")[0]
+            result.save("../results/transfer/"+texture_name+"_"+target_name+"_b="+str(args.block_size)+"_o="+
+                        str(overlap)+"_a="+str(args.alpha).replace(".", "_")+"_t="+
+                        str(args.tolerance).replace(".", "_")+".png")
     except Exception as E:
         print("ERROR: ", E)
         sys.exit(1)
@@ -40,7 +55,6 @@ if __name__ == "__main__":
     parser.add_argument("--save", action="store_true", help="save result")
     parser.add_argument("--img", "-i", type=str, help="path of input image for synthesis/transfer")
     parser.add_argument("--texture", "-t", type=str, help="path of texture image for transfer")
-    # parser.add_argument("-tar", "--target", type=str, help="path of target image for transfer")
     parser.add_argument("--block_size", "-b", type=int, default=100, help="block size in pixels")
     parser.add_argument("--overlap", "-o", type=int, default=None,
                         help="overlap size in pixels (defaults to block_size/6)")
@@ -57,7 +71,7 @@ if __name__ == "__main__":
         sys.exit(1)
     elif args.synthesis:
         synthesis(args)
-    elif args.transfer():
+    elif args.transfer:
         transfer(args)
     else:
         print("ERROR: Either synthesis or transfer must be selected")
