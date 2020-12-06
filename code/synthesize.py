@@ -34,10 +34,10 @@ def synthesize(img, blockSize, overlap, h_out, w_out, tolerance):
 
             # row
             startX = i * (blockSize[0] - overlap)
-            endX = min(startX + blockSize[0], w_out)
+            endX = min(startX + blockSize[0], h_out)
             # col
             startY = j * (blockSize[1] - overlap)  
-            endY = min(startY + blockSize[1], h_out)
+            endY = min(startY + blockSize[1], w_out)
             curr_block = out_img[startX:endX, startY:endY, :]
 
             matched_block = get_match(blocks, curr_block, blockSize, tolerance)
